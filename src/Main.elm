@@ -64,10 +64,7 @@ type alias Flag =
 
 initModel : Flag -> Model
 initModel flag =
-    { -- Counter
-      count = 0
-
-    -- Window
+    { count = 0
     , window =
         { width = flag.width / 2
         , height = flag.height / 2
@@ -155,7 +152,6 @@ update msg model =
                         |> List.reverse
                     else
                         inputs
-
                 numInput =
                     model.numInput ++ newNums
                     |> (\l -> List.drop (List.length l - 3) l)
@@ -188,7 +184,6 @@ update msg model =
 checkAnswer : Model -> ( Model, Cmd Msg )
 checkAnswer model =
     let
-        getNextRectangle = Random.generate NewRectangle <| getQuestion model.highestNum model.numScores
         answer =
             model.numInput
             |> List.map String.fromInt
@@ -196,11 +191,17 @@ checkAnswer model =
             |> String.toInt
             |> Maybe.withDefault -1
 
+        correct = answer == model.rectangle.h * model.rectangle.w
+        scores = updateNumberScores model.rectangle.h model.rectangle.w correct model.numScores
+
+        getNextRectangle = Random.generate NewRectangle <| getQuestion model.highestNum scores
+
+
         (model_, cmd) = 
             if answer == model.rectangle.h * model.rectangle.w then
-                ({ model | score = model.score + 1, numInput = [] }, getNextRectangle)
+                ({ model | score = model.score + 1, numInput = [], numScores = scores }, getNextRectangle)
             else
-                ({model | numInput = []}, Cmd.none)
+                ({model | numInput = [], numScores = scores }, Cmd.none)
     in
         (model_, cmd)
 
@@ -285,6 +286,14 @@ viewTexts model input renderables =
             ( model.window.width / 2 - 90, (model.window.height) - 45 )
             (String.padLeft 3 '0' <| input)
 
+viewScore : Model -> List Renderable -> List Renderable
+viewScore model renderables =
+    renderables 
+        |> textComposable [ font 20, fill colorWhilePlaying, align Left ]
+            ( model.window.width - 180 , 45 )
+            ("SCORE: " ++ String.fromInt model.score)
+
+
 
 viewRectangle : Rectangle -> Window -> Color.Color -> List Renderable -> List Renderable
 viewRectangle rectangle window color renderables =
@@ -333,9 +342,9 @@ viewCanvas model =
     in
     []
         |> viewFullscreenRect model.window (Color.rgb 0.9 0.7 1)
-        |> textComposable [ font 26, align Left ] (0,0) input
         |> viewRectangle model.rectangle model.window colorWhilePlaying
         |> viewTexts model input
+        |> viewScore model
         
 
 

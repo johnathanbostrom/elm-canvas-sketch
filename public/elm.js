@@ -5341,6 +5341,7 @@ var $elm$random$Random$int = F2(
 				}
 			});
 	});
+var $elm$core$Debug$log = _Debug_log;
 var $elm$random$Random$map2 = F3(
 	function (func, _v0, _v1) {
 		var genA = _v0.a;
@@ -5438,6 +5439,7 @@ var $author$project$MathGen$getQuestion = F2(
 					_Utils_Tuple2(20 - scores.nines, 9),
 					_Utils_Tuple2(20 - scores.tens, 10)
 				]));
+		var lg = A2($elm$core$Debug$log, 'scores', scores);
 		return A3(
 			$elm$random$Random$map2,
 			$author$project$MathGen$Rectangle,
@@ -6046,6 +6048,85 @@ var $elm$core$String$concat = function (strings) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$MathGen$updateNumberScores = F4(
+	function (multiplicand, multiplier, correct, scores) {
+		var change = correct ? 1 : (-2);
+		var update = F2(
+			function (i, s) {
+				switch (i) {
+					case 1:
+						return _Utils_update(
+							s,
+							{
+								ones: A2($elm$core$Basics$min, s.ones + change, 20)
+							});
+					case 2:
+						return _Utils_update(
+							s,
+							{
+								twos: A2($elm$core$Basics$min, s.twos + change, 20)
+							});
+					case 3:
+						return _Utils_update(
+							s,
+							{
+								threes: A2($elm$core$Basics$min, s.threes + change, 20)
+							});
+					case 4:
+						return _Utils_update(
+							s,
+							{
+								fours: A2($elm$core$Basics$min, s.fours + change, 20)
+							});
+					case 5:
+						return _Utils_update(
+							s,
+							{
+								fives: A2($elm$core$Basics$min, s.fives + change, 20)
+							});
+					case 6:
+						return _Utils_update(
+							s,
+							{
+								sixes: A2($elm$core$Basics$min, s.sixes + change, 20)
+							});
+					case 7:
+						return _Utils_update(
+							s,
+							{
+								sevens: A2($elm$core$Basics$min, s.sevens + change, 20)
+							});
+					case 8:
+						return _Utils_update(
+							s,
+							{
+								eights: A2($elm$core$Basics$min, s.eights + change, 20)
+							});
+					case 9:
+						return _Utils_update(
+							s,
+							{
+								nines: A2($elm$core$Basics$min, s.nines + change, 20)
+							});
+					case 10:
+						return _Utils_update(
+							s,
+							{
+								tens: A2($elm$core$Basics$min, s.tens + change, 20)
+							});
+					default:
+						return s;
+				}
+			});
+		return A2(
+			update,
+			multiplier,
+			A2(update, multiplicand, scores));
+	});
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -6056,24 +6137,26 @@ var $elm$core$Maybe$withDefault = F2(
 		}
 	});
 var $author$project$Main$checkAnswer = function (model) {
-	var getNextRectangle = A2(
-		$elm$random$Random$generate,
-		$author$project$Main$NewRectangle,
-		A2($author$project$MathGen$getQuestion, model.highestNum, model.numScores));
 	var answer = A2(
 		$elm$core$Maybe$withDefault,
 		-1,
 		$elm$core$String$toInt(
 			$elm$core$String$concat(
 				A2($elm$core$List$map, $elm$core$String$fromInt, model.numInput))));
+	var correct = _Utils_eq(answer, model.rectangle.h * model.rectangle.w);
+	var scores = A4($author$project$MathGen$updateNumberScores, model.rectangle.h, model.rectangle.w, correct, model.numScores);
+	var getNextRectangle = A2(
+		$elm$random$Random$generate,
+		$author$project$Main$NewRectangle,
+		A2($author$project$MathGen$getQuestion, model.highestNum, scores));
 	var _v0 = _Utils_eq(answer, model.rectangle.h * model.rectangle.w) ? _Utils_Tuple2(
 		_Utils_update(
 			model,
-			{numInput: _List_Nil, score: model.score + 1}),
+			{numInput: _List_Nil, numScores: scores, score: model.score + 1}),
 		getNextRectangle) : _Utils_Tuple2(
 		_Utils_update(
 			model,
-			{numInput: _List_Nil}),
+			{numInput: _List_Nil, numScores: scores}),
 		$elm$core$Platform$Cmd$none);
 	var model_ = _v0.a;
 	var cmd = _v0.b;
@@ -7372,35 +7455,6 @@ var $joakin$elm_canvas$Canvas$toHtml = F3(
 			attrs,
 			entities);
 	});
-var $joakin$elm_canvas$Canvas$Settings$Text$Left = {$: 'Left'};
-var $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand = function (a) {
-	return {$: 'SettingCommand', a: a};
-};
-var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$textAlign = function (align) {
-	return A2(
-		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$field,
-		'textAlign',
-		$elm$json$Json$Encode$string(align));
-};
-var $joakin$elm_canvas$Canvas$Settings$Text$textAlignToString = function (alignment) {
-	switch (alignment.$) {
-		case 'Left':
-			return 'left';
-		case 'Right':
-			return 'right';
-		case 'Center':
-			return 'center';
-		case 'Start':
-			return 'start';
-		default:
-			return 'end';
-	}
-};
-var $joakin$elm_canvas$Canvas$Settings$Text$align = function (alignment) {
-	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand(
-		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$textAlign(
-			$joakin$elm_canvas$Canvas$Settings$Text$textAlignToString(alignment)));
-};
 var $avh4$elm_color$Color$scaleFrom255 = function (c) {
 	return c / 255;
 };
@@ -7414,44 +7468,34 @@ var $avh4$elm_color$Color$rgb255 = F3(
 			1.0);
 	});
 var $author$project$Main$colorWhilePlaying = A3($avh4$elm_color$Color$rgb255, 139, 109, 154);
-var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$font = function (f) {
-	return A2(
-		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$field,
-		'font',
-		$elm$json$Json$Encode$string(f));
-};
-var $joakin$elm_canvas$Canvas$Settings$Text$font = function (_v0) {
-	var size = _v0.size;
-	var family = _v0.family;
-	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand(
-		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$font(
-			$elm$core$String$fromInt(size) + ('px ' + family)));
-};
-var $author$project$Main$font = function (size) {
-	return $joakin$elm_canvas$Canvas$Settings$Text$font(
-		{family: 'Major Mono Display, monospace', size: size});
-};
-var $elm$core$Debug$log = _Debug_log;
 var $avh4$elm_color$Color$rgb = F3(
 	function (r, g, b) {
 		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, 1.0);
 	});
-var $elm$core$String$replace = F3(
-	function (before, after, string) {
-		return A2(
-			$elm$core$String$join,
-			after,
-			A2($elm$core$String$split, before, string));
+var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
+	return {$: 'Fill', a: a};
+};
+var $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp = function (a) {
+	return {$: 'SettingDrawOp', a: a};
+};
+var $joakin$elm_canvas$Canvas$Settings$fill = function (color) {
+	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp(
+		$joakin$elm_canvas$Canvas$Internal$Canvas$Fill(color));
+};
+var $joakin$elm_canvas$Canvas$Internal$Canvas$Rect = F3(
+	function (a, b, c) {
+		return {$: 'Rect', a: a, b: b, c: c};
 	});
-var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableText = function (a) {
-	return {$: 'DrawableText', a: a};
+var $joakin$elm_canvas$Canvas$rect = F3(
+	function (pos, width, height) {
+		return A3($joakin$elm_canvas$Canvas$Internal$Canvas$Rect, pos, width, height);
+	});
+var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes = function (a) {
+	return {$: 'DrawableShapes', a: a};
 };
 var $joakin$elm_canvas$Canvas$Internal$Canvas$NotSpecified = {$: 'NotSpecified'};
 var $joakin$elm_canvas$Canvas$Renderable = function (a) {
 	return {$: 'Renderable', a: a};
-};
-var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
-	return {$: 'Fill', a: a};
 };
 var $joakin$elm_canvas$Canvas$Internal$Canvas$FillAndStroke = F2(
 	function (a, b) {
@@ -7562,54 +7606,6 @@ var $joakin$elm_canvas$Canvas$addSettingsToRenderable = F2(
 			});
 		return A3($elm$core$List$foldl, addSetting, renderable, settings);
 	});
-var $joakin$elm_canvas$Canvas$text = F3(
-	function (settings, point, str) {
-		return A2(
-			$joakin$elm_canvas$Canvas$addSettingsToRenderable,
-			settings,
-			$joakin$elm_canvas$Canvas$Renderable(
-				{
-					commands: _List_Nil,
-					drawOp: $joakin$elm_canvas$Canvas$Internal$Canvas$NotSpecified,
-					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableText(
-						{maxWidth: $elm$core$Maybe$Nothing, point: point, text: str})
-				}));
-	});
-var $author$project$Main$text = F3(
-	function (settings, point, string) {
-		return A3(
-			$joakin$elm_canvas$Canvas$text,
-			settings,
-			point,
-			A3($elm$core$String$replace, 'a', 'A', string));
-	});
-var $author$project$Main$textComposable = F4(
-	function (settings, point, string, renderables) {
-		return _Utils_ap(
-			renderables,
-			_List_fromArray(
-				[
-					A3($author$project$Main$text, settings, point, string)
-				]));
-	});
-var $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp = function (a) {
-	return {$: 'SettingDrawOp', a: a};
-};
-var $joakin$elm_canvas$Canvas$Settings$fill = function (color) {
-	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp(
-		$joakin$elm_canvas$Canvas$Internal$Canvas$Fill(color));
-};
-var $joakin$elm_canvas$Canvas$Internal$Canvas$Rect = F3(
-	function (a, b, c) {
-		return {$: 'Rect', a: a, b: b, c: c};
-	});
-var $joakin$elm_canvas$Canvas$rect = F3(
-	function (pos, width, height) {
-		return A3($joakin$elm_canvas$Canvas$Internal$Canvas$Rect, pos, width, height);
-	});
-var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableShapes = function (a) {
-	return {$: 'DrawableShapes', a: a};
-};
 var $joakin$elm_canvas$Canvas$shapes = F2(
 	function (settings, ss) {
 		return A2(
@@ -7646,6 +7642,34 @@ var $author$project$Main$viewFullscreenRect = F3(
 	});
 var $joakin$elm_canvas$Canvas$Settings$Text$Center = {$: 'Center'};
 var $joakin$elm_canvas$Canvas$Settings$Text$Middle = {$: 'Middle'};
+var $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand = function (a) {
+	return {$: 'SettingCommand', a: a};
+};
+var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$textAlign = function (align) {
+	return A2(
+		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$field,
+		'textAlign',
+		$elm$json$Json$Encode$string(align));
+};
+var $joakin$elm_canvas$Canvas$Settings$Text$textAlignToString = function (alignment) {
+	switch (alignment.$) {
+		case 'Left':
+			return 'left';
+		case 'Right':
+			return 'right';
+		case 'Center':
+			return 'center';
+		case 'Start':
+			return 'start';
+		default:
+			return 'end';
+	}
+};
+var $joakin$elm_canvas$Canvas$Settings$Text$align = function (alignment) {
+	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand(
+		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$textAlign(
+			$joakin$elm_canvas$Canvas$Settings$Text$textAlignToString(alignment)));
+};
 var $joakin$elm_canvas$Canvas$Settings$Text$textBaseLineToString = function (baseLineSetting) {
 	switch (baseLineSetting.$) {
 		case 'Top':
@@ -7673,6 +7697,23 @@ var $joakin$elm_canvas$Canvas$Settings$Text$baseLine = function (textBaseLine) {
 		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$textBaseline(
 			$joakin$elm_canvas$Canvas$Settings$Text$textBaseLineToString(textBaseLine)));
 };
+var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$font = function (f) {
+	return A2(
+		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$field,
+		'font',
+		$elm$json$Json$Encode$string(f));
+};
+var $joakin$elm_canvas$Canvas$Settings$Text$font = function (_v0) {
+	var size = _v0.size;
+	var family = _v0.family;
+	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand(
+		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$font(
+			$elm$core$String$fromInt(size) + ('px ' + family)));
+};
+var $author$project$Main$font = function (size) {
+	return $joakin$elm_canvas$Canvas$Settings$Text$font(
+		{family: 'Major Mono Display, monospace', size: size});
+};
 var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$lineWidth = function (value) {
 	return A2(
 		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$field,
@@ -7683,14 +7724,41 @@ var $joakin$elm_canvas$Canvas$Settings$Line$lineWidth = function (width) {
 	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand(
 		$joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$lineWidth(width));
 };
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
 var $joakin$elm_canvas$Canvas$Settings$stroke = function (color) {
 	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp(
 		$joakin$elm_canvas$Canvas$Internal$Canvas$Stroke(color));
 };
+var $elm$core$String$replace = F3(
+	function (before, after, string) {
+		return A2(
+			$elm$core$String$join,
+			after,
+			A2($elm$core$String$split, before, string));
+	});
+var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableText = function (a) {
+	return {$: 'DrawableText', a: a};
+};
+var $joakin$elm_canvas$Canvas$text = F3(
+	function (settings, point, str) {
+		return A2(
+			$joakin$elm_canvas$Canvas$addSettingsToRenderable,
+			settings,
+			$joakin$elm_canvas$Canvas$Renderable(
+				{
+					commands: _List_Nil,
+					drawOp: $joakin$elm_canvas$Canvas$Internal$Canvas$NotSpecified,
+					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableText(
+						{maxWidth: $elm$core$Maybe$Nothing, point: point, text: str})
+				}));
+	});
+var $author$project$Main$text = F3(
+	function (settings, point, string) {
+		return A3(
+			$joakin$elm_canvas$Canvas$text,
+			settings,
+			point,
+			A3($elm$core$String$replace, 'a', 'A', string));
+	});
 var $author$project$Main$viewRectangle = F4(
 	function (rectangle, window, color, renderables) {
 		var textSettings = _List_fromArray(
@@ -7738,6 +7806,30 @@ var $author$project$Main$viewRectangle = F4(
 					textRightPos,
 					$elm$core$String$fromInt(rectangle.w))
 				]));
+	});
+var $joakin$elm_canvas$Canvas$Settings$Text$Left = {$: 'Left'};
+var $author$project$Main$textComposable = F4(
+	function (settings, point, string, renderables) {
+		return _Utils_ap(
+			renderables,
+			_List_fromArray(
+				[
+					A3($author$project$Main$text, settings, point, string)
+				]));
+	});
+var $author$project$Main$viewScore = F2(
+	function (model, renderables) {
+		return A4(
+			$author$project$Main$textComposable,
+			_List_fromArray(
+				[
+					$author$project$Main$font(20),
+					$joakin$elm_canvas$Canvas$Settings$fill($author$project$Main$colorWhilePlaying),
+					$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Left)
+				]),
+			_Utils_Tuple2(model.window.width - 180, 45),
+			'SCORE: ' + $elm$core$String$fromInt(model.score),
+			renderables);
 	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
@@ -7787,24 +7879,18 @@ var $author$project$Main$viewCanvas = function (model) {
 	var input = $elm$core$String$concat(
 		A2($elm$core$List$map, $elm$core$String$fromInt, model.numInput));
 	var lg = A2($elm$core$Debug$log, 'input ', input);
-	return A3(
-		$author$project$Main$viewTexts,
+	return A2(
+		$author$project$Main$viewScore,
 		model,
-		input,
-		A4(
-			$author$project$Main$viewRectangle,
-			model.rectangle,
-			model.window,
-			$author$project$Main$colorWhilePlaying,
+		A3(
+			$author$project$Main$viewTexts,
+			model,
+			input,
 			A4(
-				$author$project$Main$textComposable,
-				_List_fromArray(
-					[
-						$author$project$Main$font(26),
-						$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Left)
-					]),
-				_Utils_Tuple2(0, 0),
-				input,
+				$author$project$Main$viewRectangle,
+				model.rectangle,
+				model.window,
+				$author$project$Main$colorWhilePlaying,
 				A3(
 					$author$project$Main$viewFullscreenRect,
 					model.window,

@@ -50,22 +50,22 @@ updateNumberScores multiplicand multiplier correct scores =
     let
         change = 
             if correct then 
-                -1
-            else
                 1
+            else
+                -2
 
         update i s =
             case i of
-               1 -> { s | ones = max (s.ones + change) 20 }
-               2 -> { s | twos = max (s.twos + change) 20 }
-               3 -> { s | threes = max (s.threes + change) 20 }
-               4 -> { s | fours = max (s.fours + change) 20 }
-               5 -> { s | fives = max (s.fives + change) 20 }
-               6 -> { s | sixes = max (s.sixes + change) 20 }
-               7 -> { s | sevens = max (s.sevens + change) 20 }
-               8 -> { s | eights = max (s.eights + change) 20 }
-               9 -> { s | nines = max (s.nines + change) 20 }
-               10 -> { s | tens = max (s.tens + change) 20 }
+               1 -> { s | ones = min (s.ones + change) 20 }
+               2 -> { s | twos = min (s.twos + change) 20 }
+               3 -> { s | threes = min (s.threes + change) 20 }
+               4 -> { s | fours = min (s.fours + change) 20 }
+               5 -> { s | fives = min (s.fives + change) 20 }
+               6 -> { s | sixes = min (s.sixes + change) 20 }
+               7 -> { s | sevens = min (s.sevens + change) 20 }
+               8 -> { s | eights = min (s.eights + change) 20 }
+               9 -> { s | nines = min (s.nines + change) 20 }
+               10 -> { s | tens = min (s.tens + change) 20 }
                _ -> s
     in        
         update multiplicand scores
@@ -88,6 +88,7 @@ getQuestion max scores =
                 , (toFloat <| 20 - scores.nines , 9)
                 , (toFloat <| 20 - scores.tens , 10)
                 ]
+        lg = Debug.log "scores" scores
 
     in
     Random.map2 Rectangle (Random.int 1 max) weighted
