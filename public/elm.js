@@ -5304,7 +5304,7 @@ var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
-var $author$project$MathGen$minScore = 0;
+var $author$project$MathGen$minScore = 1;
 var $author$project$MathGen$boundedScore = function (score) {
 	return A2(
 		$elm$core$Basics$min,
@@ -5516,7 +5516,8 @@ var $author$project$Main$initModel = function (flag) {
 	return {
 		count: 0,
 		countDown: 10,
-		highestNum: 3,
+		currentProgress: 0,
+		highestNum: 1,
 		numInput: _List_Nil,
 		numScores: $author$project$MathGen$initNumberScores,
 		pressedKeys: _List_Nil,
@@ -5531,7 +5532,7 @@ var $author$project$Main$init = function (flag) {
 		A2(
 			$elm$random$Random$generate,
 			$author$project$Main$NewRectangle,
-			A2($author$project$MathGen$getQuestion, 3, $author$project$MathGen$initNumberScores)));
+			A2($author$project$MathGen$getQuestion, 1, $author$project$MathGen$initNumberScores)));
 };
 var $author$project$Main$Frame = function (a) {
 	return {$: 'Frame', a: a};
@@ -6310,6 +6311,66 @@ var $ohanhi$keyboard$Keyboard$Enter = {$: 'Enter'};
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
+var $author$project$MathGen$advanceMultiplicand = F2(
+	function (newMax, scores) {
+		switch (newMax) {
+			case 1:
+				return _Utils_update(
+					scores,
+					{ones: $author$project$MathGen$minScore});
+			case 2:
+				return _Utils_update(
+					scores,
+					{twos: $author$project$MathGen$minScore});
+			case 3:
+				return _Utils_update(
+					scores,
+					{threes: $author$project$MathGen$minScore});
+			case 4:
+				return _Utils_update(
+					scores,
+					{fours: $author$project$MathGen$minScore});
+			case 5:
+				return _Utils_update(
+					scores,
+					{fives: $author$project$MathGen$minScore});
+			case 6:
+				return _Utils_update(
+					scores,
+					{sixes: $author$project$MathGen$minScore});
+			case 7:
+				return _Utils_update(
+					scores,
+					{sevens: $author$project$MathGen$minScore});
+			case 8:
+				return _Utils_update(
+					scores,
+					{eights: $author$project$MathGen$minScore});
+			case 9:
+				return _Utils_update(
+					scores,
+					{nines: $author$project$MathGen$minScore});
+			case 10:
+				return _Utils_update(
+					scores,
+					{tens: $author$project$MathGen$minScore});
+			default:
+				return scores;
+		}
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$updateCurrentProgess = F2(
+	function (correct, model) {
+		return (!correct) ? model : (((model.currentProgress > 5) && (model.highestNum < 10)) ? _Utils_update(
+			model,
+			{
+				currentProgress: 0,
+				highestNum: model.highestNum + 1,
+				numScores: A2($author$project$MathGen$advanceMultiplicand, model.highestNum + 1, model.numScores)
+			}) : _Utils_update(
+			model,
+			{currentProgress: model.currentProgress + 1}));
+	});
 var $author$project$MathGen$updateNumberScores = F5(
 	function (multiplicand, multiplier, timeLeft, correct, scores) {
 		var change = correct ? timeLeft : (-9);
@@ -6395,6 +6456,10 @@ var $elm$core$Maybe$withDefault = F2(
 		}
 	});
 var $author$project$Main$checkAnswer = function (model) {
+	var lg = A2(
+		$elm$core$Debug$log,
+		'prog',
+		_Utils_Tuple2(model.currentProgress, model.highestNum));
 	var answer = A2(
 		$elm$core$Maybe$withDefault,
 		-1,
@@ -6402,23 +6467,19 @@ var $author$project$Main$checkAnswer = function (model) {
 			$elm$core$String$concat(
 				A2($elm$core$List$map, $elm$core$String$fromInt, model.numInput))));
 	var correct = _Utils_eq(answer, model.rectangle.h * model.rectangle.w);
+	var model_ = A2(
+		$author$project$Main$updateCurrentProgess,
+		correct,
+		_Utils_update(
+			model,
+			{numInput: _List_Nil, score: model.score + model.countDown}));
+	var score = correct ? (model.score + model.countDown) : (model.score - 9);
 	var scores = A5($author$project$MathGen$updateNumberScores, model.rectangle.h, model.rectangle.w, model.countDown, correct, model.numScores);
 	var getNextRectangle = A2(
 		$elm$random$Random$generate,
 		$author$project$Main$NewRectangle,
-		A2($author$project$MathGen$getQuestion, model.highestNum, scores));
-	var _v0 = _Utils_eq(answer, model.rectangle.h * model.rectangle.w) ? _Utils_Tuple2(
-		_Utils_update(
-			model,
-			{numInput: _List_Nil, numScores: scores, score: model.score + model.countDown}),
-		getNextRectangle) : _Utils_Tuple2(
-		_Utils_update(
-			model,
-			{numInput: _List_Nil, numScores: scores, score: model.score - 9}),
-		getNextRectangle);
-	var model_ = _v0.a;
-	var cmd = _v0.b;
-	return _Utils_Tuple2(model_, cmd);
+		A2($author$project$MathGen$getQuestion, model_.highestNum, scores));
+	return _Utils_Tuple2(model_, getNextRectangle);
 };
 var $elm$core$List$drop = F2(
 	function (n, list) {

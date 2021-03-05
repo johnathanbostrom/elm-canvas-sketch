@@ -1,4 +1,4 @@
-module MathGen exposing (Rectangle, randomRectangle, updateNumberScores, NumberScores, getQuestion, initNumberScores)
+module MathGen exposing (Rectangle, randomRectangle, updateNumberScores, NumberScores, getQuestion, initNumberScores, advanceMultiplicand)
 import Random
 import Random.List as Random
 
@@ -78,6 +78,21 @@ updateNumberScores multiplicand multiplier timeLeft correct scores =
         update multiplicand scores
         |> update multiplier
 
+
+advanceMultiplicand : Int -> NumberScores -> NumberScores
+advanceMultiplicand newMax scores =
+    case newMax of
+       1 -> { scores | ones = minScore }
+       2 -> { scores | twos = minScore }
+       3 -> { scores | threes = minScore }
+       4 -> { scores | fours = minScore }
+       5 -> { scores | fives = minScore }
+       6 -> { scores | sixes = minScore }
+       7 -> { scores | sevens = minScore }
+       8 -> { scores | eights = minScore }
+       9 -> { scores | nines = minScore }
+       10 -> { scores | tens = minScore }
+       _ -> scores
 
 getQuestion : Int -> NumberScores -> Random.Generator Rectangle 
 getQuestion max scores =

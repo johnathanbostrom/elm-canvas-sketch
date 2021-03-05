@@ -26,10 +26,7 @@ import Time
 
 
 type alias Model =
-    { -- Counter
-      count : Float
-
-    -- Window
+    { count : Float
     , window : Window
     , highestNum : Int
     , rectangle : Rectangle
@@ -38,6 +35,7 @@ type alias Model =
     , score : Int
     , numScores : NumberScores
     , countDown : Int
+    , currentProgress : Int
     }
 
 
@@ -71,19 +69,20 @@ initModel flag =
         { width = flag.width / 2
         , height = flag.height / 2
         }
-    , highestNum = 3
+    , highestNum = 1
     , rectangle = Rectangle 2 3
     , pressedKeys = []
     , numInput = []
     , score = 0
     , numScores = initNumberScores
     , countDown = 10
+    , currentProgress = 0
     }
 
 init : Flag -> ( Model, Cmd Msg )
 init flag =
     ( initModel flag
-    , Random.generate NewRectangle <| getQuestion 3 initNumberScores
+    , Random.generate NewRectangle <| getQuestion 1 initNumberScores
     )
 
 
@@ -205,15 +204,35 @@ checkAnswer model =
         correct = answer == model.rectangle.h * model.rectangle.w
         scores = updateNumberScores model.rectangle.h model.rectangle.w model.countDown correct model.numScores
 
-        getNextRectangle = Random.generate NewRectangle <| getQuestion model.highestNum scores
-
-        (model_, cmd) = 
-            if answer == model.rectangle.h * model.rectangle.w then
-                ({ model | score = model.score + model.countDown, numInput = [], numScores = scores }, getNextRectangle)
+        score = 
+            if correct then 
+                model.score + model.countDown
             else
-                ({model | numInput = [], numScores = scores, score = model.score - 9 }, getNextRectangle)
+                model.score - 9
+
+        model_ =
+            { model 
+            | score = model.score + model.countDown
+            , numInput = []
+            } |> updateCurrentProgess correct
+
+        getNextRectangle = Random.generate NewRectangle <| getQuestion model_.highestNum scores
+        lg = Debug.log "prog" (model.currentProgress, model.highestNum)
     in
-        (model_, cmd)
+        ( model_, getNextRectangle)
+
+updateCurrentProgess : Bool -> Model -> Model
+updateCurrentProgess correct model =
+    if not correct then
+        model
+    else if model.currentProgress > 5 && model.highestNum < 10 then
+        { model 
+        | currentProgress = 0
+        , highestNum = model.highestNum + 1
+        , numScores = MathGen.advanceMultiplicand (model.highestNum + 1) model.numScores
+        }
+    else
+        { model | currentProgress = model.currentProgress + 1}
 
 type alias Window =
     { height : Float
