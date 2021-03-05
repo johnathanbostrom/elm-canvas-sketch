@@ -203,16 +203,15 @@ checkAnswer model =
             |> Maybe.withDefault -1
 
         correct = answer == model.rectangle.h * model.rectangle.w
-        scores = updateNumberScores model.rectangle.h model.rectangle.w correct model.numScores
+        scores = updateNumberScores model.rectangle.h model.rectangle.w model.countDown correct model.numScores
 
         getNextRectangle = Random.generate NewRectangle <| getQuestion model.highestNum scores
 
-
         (model_, cmd) = 
             if answer == model.rectangle.h * model.rectangle.w then
-                ({ model | score = model.score + 1, numInput = [], numScores = scores }, getNextRectangle)
+                ({ model | score = model.score + model.countDown, numInput = [], numScores = scores }, getNextRectangle)
             else
-                ({model | numInput = [], numScores = scores }, getNextRectangle)
+                ({model | numInput = [], numScores = scores, score = model.score - 9 }, getNextRectangle)
     in
         (model_, cmd)
 

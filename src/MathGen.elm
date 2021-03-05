@@ -45,27 +45,34 @@ initNumberScores =
     , tens = 10
     }
 
-updateNumberScores : Int -> Int -> Bool -> NumberScores -> NumberScores
-updateNumberScores multiplicand multiplier correct scores =
+boundedScore score = 
+    max score minScore
+    |> min maxScore
+
+minScore = 1
+maxScore = 50
+
+updateNumberScores : Int -> Int -> Int -> Bool -> NumberScores -> NumberScores
+updateNumberScores multiplicand multiplier timeLeft correct scores =
     let
         change = 
             if correct then 
-                1
+                timeLeft
             else
-                -2
+                -9
 
         update i s =
             case i of
-               1 -> { s | ones = min (s.ones + change) 20 }
-               2 -> { s | twos = min (s.twos + change) 20 }
-               3 -> { s | threes = min (s.threes + change) 20 }
-               4 -> { s | fours = min (s.fours + change) 20 }
-               5 -> { s | fives = min (s.fives + change) 20 }
-               6 -> { s | sixes = min (s.sixes + change) 20 }
-               7 -> { s | sevens = min (s.sevens + change) 20 }
-               8 -> { s | eights = min (s.eights + change) 20 }
-               9 -> { s | nines = min (s.nines + change) 20 }
-               10 -> { s | tens = min (s.tens + change) 20 }
+               1 -> { s | ones = boundedScore (s.ones + change) }
+               2 -> { s | twos = boundedScore (s.twos + change) }
+               3 -> { s | threes = boundedScore (s.threes + change) }
+               4 -> { s | fours = boundedScore (s.fours + change) }
+               5 -> { s | fives = boundedScore (s.fives + change) }
+               6 -> { s | sixes = boundedScore (s.sixes + change) }
+               7 -> { s | sevens = boundedScore (s.sevens + change) }
+               8 -> { s | eights = boundedScore (s.eights + change) }
+               9 -> { s | nines = boundedScore (s.nines + change) }
+               10 -> { s | tens = boundedScore (s.tens + change) }
                _ -> s
     in        
         update multiplicand scores
@@ -77,18 +84,29 @@ getQuestion max scores =
     let
         weighted =
             Random.weighted
-                (toFloat <| 20 - scores.ones , 1)
-                [ (toFloat <| 20 - scores.twos , 2)
-                , (toFloat <| 20 - scores.threes , 3)
-                , (toFloat <| 20 - scores.fours , 4)
-                , (toFloat <| 20 - scores.fives , 5)
-                , (toFloat <| 20 - scores.sixes , 6)
-                , (toFloat <| 20 - scores.sevens , 7)
-                , (toFloat <| 20 - scores.eights , 8)
-                , (toFloat <| 20 - scores.nines , 9)
-                , (toFloat <| 20 - scores.tens , 10)
+                (toFloat <| boundedScore <| maxScore - scores.ones , 1)
+                [ (toFloat <| boundedScore <| maxScore - scores.twos , 2)
+                , (toFloat <| boundedScore <| maxScore - scores.threes , 3)
+                , (toFloat <| boundedScore <| maxScore - scores.fours , 4)
+                , (toFloat <| boundedScore <| maxScore - scores.fives , 5)
+                , (toFloat <| boundedScore <| maxScore - scores.sixes , 6)
+                , (toFloat <| boundedScore <| maxScore - scores.sevens , 7)
+                , (toFloat <| boundedScore <| maxScore - scores.eights , 8)
+                , (toFloat <| boundedScore <| maxScore - scores.nines , 9)
+                , (toFloat <| boundedScore <| maxScore - scores.tens , 10)
                 ]
         lg = Debug.log "scores" scores
+        lg2 = Debug.log "weights" 
+            <|  [ (toFloat <| boundedScore <|maxScore - scores.twos , 2)
+                , (toFloat <| boundedScore <| maxScore - scores.threes , 3)
+                , (toFloat <| boundedScore <| maxScore - scores.fours , 4)
+                , (toFloat <| boundedScore <| maxScore - scores.fives , 5)
+                , (toFloat <| boundedScore <| maxScore - scores.sixes , 6)
+                , (toFloat <| boundedScore <| maxScore - scores.sevens , 7)
+                , (toFloat <| boundedScore <| maxScore - scores.eights , 8)
+                , (toFloat <| boundedScore <| maxScore - scores.nines , 9)
+                , (toFloat <| boundedScore <| maxScore - scores.tens , 10)
+                ]
 
     in
     Random.map2 Rectangle (Random.int 1 max) weighted

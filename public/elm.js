@@ -5299,6 +5299,18 @@ var $author$project$MathGen$Rectangle = F2(
 	function (h, w) {
 		return {h: h, w: w};
 	});
+var $author$project$MathGen$maxScore = 50;
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$MathGen$minScore = 0;
+var $author$project$MathGen$boundedScore = function (score) {
+	return A2(
+		$elm$core$Basics$min,
+		$author$project$MathGen$maxScore,
+		A2($elm$core$Basics$max, score, $author$project$MathGen$minScore));
+};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5426,18 +5438,71 @@ var $author$project$MathGen$getQuestion = F2(
 	function (max, scores) {
 		var weighted = A2(
 			$elm$random$Random$weighted,
-			_Utils_Tuple2(20 - scores.ones, 1),
+			_Utils_Tuple2(
+				$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.ones),
+				1),
 			_List_fromArray(
 				[
-					_Utils_Tuple2(20 - scores.twos, 2),
-					_Utils_Tuple2(20 - scores.threes, 3),
-					_Utils_Tuple2(20 - scores.fours, 4),
-					_Utils_Tuple2(20 - scores.fives, 5),
-					_Utils_Tuple2(20 - scores.sixes, 6),
-					_Utils_Tuple2(20 - scores.sevens, 7),
-					_Utils_Tuple2(20 - scores.eights, 8),
-					_Utils_Tuple2(20 - scores.nines, 9),
-					_Utils_Tuple2(20 - scores.tens, 10)
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.twos),
+					2),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.threes),
+					3),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.fours),
+					4),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.fives),
+					5),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.sixes),
+					6),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.sevens),
+					7),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.eights),
+					8),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.nines),
+					9),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.tens),
+					10)
+				]));
+		var lg2 = A2(
+			$elm$core$Debug$log,
+			'weights',
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.twos),
+					2),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.threes),
+					3),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.fours),
+					4),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.fives),
+					5),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.sixes),
+					6),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.sevens),
+					7),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.eights),
+					8),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.nines),
+					9),
+					_Utils_Tuple2(
+					$author$project$MathGen$boundedScore($author$project$MathGen$maxScore - scores.tens),
+					10)
 				]));
 		var lg = A2($elm$core$Debug$log, 'scores', scores);
 		return A3(
@@ -6245,13 +6310,9 @@ var $ohanhi$keyboard$Keyboard$Enter = {$: 'Enter'};
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var $author$project$MathGen$updateNumberScores = F4(
-	function (multiplicand, multiplier, correct, scores) {
-		var change = correct ? 1 : (-2);
+var $author$project$MathGen$updateNumberScores = F5(
+	function (multiplicand, multiplier, timeLeft, correct, scores) {
+		var change = correct ? timeLeft : (-9);
 		var update = F2(
 			function (i, s) {
 				switch (i) {
@@ -6259,61 +6320,61 @@ var $author$project$MathGen$updateNumberScores = F4(
 						return _Utils_update(
 							s,
 							{
-								ones: A2($elm$core$Basics$min, s.ones + change, 20)
+								ones: $author$project$MathGen$boundedScore(s.ones + change)
 							});
 					case 2:
 						return _Utils_update(
 							s,
 							{
-								twos: A2($elm$core$Basics$min, s.twos + change, 20)
+								twos: $author$project$MathGen$boundedScore(s.twos + change)
 							});
 					case 3:
 						return _Utils_update(
 							s,
 							{
-								threes: A2($elm$core$Basics$min, s.threes + change, 20)
+								threes: $author$project$MathGen$boundedScore(s.threes + change)
 							});
 					case 4:
 						return _Utils_update(
 							s,
 							{
-								fours: A2($elm$core$Basics$min, s.fours + change, 20)
+								fours: $author$project$MathGen$boundedScore(s.fours + change)
 							});
 					case 5:
 						return _Utils_update(
 							s,
 							{
-								fives: A2($elm$core$Basics$min, s.fives + change, 20)
+								fives: $author$project$MathGen$boundedScore(s.fives + change)
 							});
 					case 6:
 						return _Utils_update(
 							s,
 							{
-								sixes: A2($elm$core$Basics$min, s.sixes + change, 20)
+								sixes: $author$project$MathGen$boundedScore(s.sixes + change)
 							});
 					case 7:
 						return _Utils_update(
 							s,
 							{
-								sevens: A2($elm$core$Basics$min, s.sevens + change, 20)
+								sevens: $author$project$MathGen$boundedScore(s.sevens + change)
 							});
 					case 8:
 						return _Utils_update(
 							s,
 							{
-								eights: A2($elm$core$Basics$min, s.eights + change, 20)
+								eights: $author$project$MathGen$boundedScore(s.eights + change)
 							});
 					case 9:
 						return _Utils_update(
 							s,
 							{
-								nines: A2($elm$core$Basics$min, s.nines + change, 20)
+								nines: $author$project$MathGen$boundedScore(s.nines + change)
 							});
 					case 10:
 						return _Utils_update(
 							s,
 							{
-								tens: A2($elm$core$Basics$min, s.tens + change, 20)
+								tens: $author$project$MathGen$boundedScore(s.tens + change)
 							});
 					default:
 						return s;
@@ -6341,7 +6402,7 @@ var $author$project$Main$checkAnswer = function (model) {
 			$elm$core$String$concat(
 				A2($elm$core$List$map, $elm$core$String$fromInt, model.numInput))));
 	var correct = _Utils_eq(answer, model.rectangle.h * model.rectangle.w);
-	var scores = A4($author$project$MathGen$updateNumberScores, model.rectangle.h, model.rectangle.w, correct, model.numScores);
+	var scores = A5($author$project$MathGen$updateNumberScores, model.rectangle.h, model.rectangle.w, model.countDown, correct, model.numScores);
 	var getNextRectangle = A2(
 		$elm$random$Random$generate,
 		$author$project$Main$NewRectangle,
@@ -6349,11 +6410,11 @@ var $author$project$Main$checkAnswer = function (model) {
 	var _v0 = _Utils_eq(answer, model.rectangle.h * model.rectangle.w) ? _Utils_Tuple2(
 		_Utils_update(
 			model,
-			{numInput: _List_Nil, numScores: scores, score: model.score + 1}),
+			{numInput: _List_Nil, numScores: scores, score: model.score + model.countDown}),
 		getNextRectangle) : _Utils_Tuple2(
 		_Utils_update(
 			model,
-			{numInput: _List_Nil, numScores: scores}),
+			{numInput: _List_Nil, numScores: scores, score: model.score - 9}),
 		getNextRectangle);
 	var model_ = _v0.a;
 	var cmd = _v0.b;
