@@ -15,6 +15,7 @@ import MathGen exposing (randomRectangle, Rectangle, updateNumberScores, NumberS
 import Random
 import Keyboard
 import Browser.Events exposing (onKeyUp)
+import Time
 
 
 -- ███    ███  ██████  ██████  ███████ ██
@@ -36,6 +37,7 @@ type alias Model =
     , numInput : List Int
     , score : Int
     , numScores : NumberScores
+    , countDown : Int
     }
 
 
@@ -75,6 +77,7 @@ initModel flag =
     , numInput = []
     , score = 0
     , numScores = initNumberScores
+    , countDown = 10
     }
 
 init : Flag -> ( Model, Cmd Msg )
@@ -97,6 +100,7 @@ subscriptions _ =
     Sub.batch <|
         [ Browser.Events.onAnimationFrameDelta Frame
         , Sub.map KeyMsg Keyboard.subscriptions
+        , Time.every 1000 Tick
         ]
 
 
@@ -112,6 +116,7 @@ type Msg
     = Frame Float
     | NewRectangle Rectangle
     | KeyMsg Keyboard.Msg
+    | Tick Time.Posix
 
 
 
@@ -128,7 +133,7 @@ update msg model =
         Frame _ ->
             ( { model | count = model.count + 1 }, Cmd.none )
         NewRectangle rectangle ->
-            (  {model | rectangle = rectangle }, Cmd.none)
+            (  {model | rectangle = rectangle, countDown = 10 }, Cmd.none)
         KeyMsg km ->
             let
                 newKeys = Keyboard.update km []
@@ -164,7 +169,13 @@ update msg model =
                 checkAnswer model_
             else
                 (model_, Cmd.none)
+        Tick t ->
+            if model.countDown < 2 then
+                checkAnswer {model | countDown = model.countDown - 1}
+            else
+                ({model | countDown = model.countDown - 1}, Cmd.none)
             
+
         
 
 
@@ -201,7 +212,7 @@ checkAnswer model =
             if answer == model.rectangle.h * model.rectangle.w then
                 ({ model | score = model.score + 1, numInput = [], numScores = scores }, getNextRectangle)
             else
-                ({model | numInput = [], numScores = scores }, Cmd.none)
+                ({model | numInput = [], numScores = scores }, getNextRectangle)
     in
         (model_, cmd)
 
@@ -293,7 +304,12 @@ viewScore model renderables =
             ( model.window.width - 180 , 45 )
             ("SCORE: " ++ String.fromInt model.score)
 
-
+viewCountDown : Model -> List Renderable -> List Renderable
+viewCountDown model renderables =
+    renderables 
+        |> textComposable [ font 20, fill colorWhilePlaying, align Right ]
+            ( 180 , 45 )
+            (String.fromInt model.countDown)
 
 viewRectangle : Rectangle -> Window -> Color.Color -> List Renderable -> List Renderable
 viewRectangle rectangle window color renderables =
@@ -345,6 +361,7 @@ viewCanvas model =
         |> viewRectangle model.rectangle model.window colorWhilePlaying
         |> viewTexts model input
         |> viewScore model
+        |> viewCountDown model
         
 
 
