@@ -5523,7 +5523,7 @@ var $author$project$Main$initModel = function (flag) {
 		pressedKeys: _List_Nil,
 		rectangle: A2($author$project$MathGen$Rectangle, 2, 3),
 		score: 0,
-		window: {height: flag.height / 2, width: flag.width / 2}
+		window: {height: flag.height * 0.9, width: flag.width * 0.9}
 	};
 };
 var $author$project$Main$init = function (flag) {
@@ -7803,7 +7803,7 @@ var $avh4$elm_color$Color$rgb = F3(
 	function (r, g, b) {
 		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, 1.0);
 	});
-var $joakin$elm_canvas$Canvas$Settings$Text$Right = {$: 'Right'};
+var $joakin$elm_canvas$Canvas$Settings$Text$Left = {$: 'Left'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$SettingCommand = function (a) {
 	return {$: 'SettingCommand', a: a};
 };
@@ -7859,6 +7859,32 @@ var $author$project$Main$font = function (size) {
 	return $joakin$elm_canvas$Canvas$Settings$Text$font(
 		{family: 'Major Mono Display, monospace', size: size});
 };
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
 var $elm$core$String$replace = F3(
 	function (before, after, string) {
 		return A2(
@@ -8020,10 +8046,14 @@ var $author$project$Main$viewCountDown = F2(
 				[
 					$author$project$Main$font(20),
 					$joakin$elm_canvas$Canvas$Settings$fill($author$project$Main$colorWhilePlaying),
-					$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Right)
+					$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Left)
 				]),
-			_Utils_Tuple2(180, 45),
-			$elm$core$String$fromInt(model.countDown),
+			_Utils_Tuple2(45, 45),
+			A3(
+				$elm$core$String$padLeft,
+				2,
+				_Utils_chr('0'),
+				$elm$core$String$fromInt(model.countDown)),
 			renderables);
 	});
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Rect = F3(
@@ -8070,6 +8100,24 @@ var $author$project$Main$viewFullscreenRect = F3(
 							window.height)
 						]))
 				]));
+	});
+var $author$project$Main$viewLevel = F2(
+	function (model, renderables) {
+		return A4(
+			$author$project$Main$textComposable,
+			_List_fromArray(
+				[
+					$author$project$Main$font(20),
+					$joakin$elm_canvas$Canvas$Settings$fill($author$project$Main$colorWhilePlaying),
+					$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Left)
+				]),
+			_Utils_Tuple2(model.window.width - 260, 45),
+			'LEVEL:' + A3(
+				$elm$core$String$padLeft,
+				2,
+				_Utils_chr('0'),
+				$elm$core$String$fromInt(model.highestNum)),
+			renderables);
 	});
 var $joakin$elm_canvas$Canvas$Settings$Text$Center = {$: 'Center'};
 var $joakin$elm_canvas$Canvas$Settings$Text$Middle = {$: 'Middle'};
@@ -8162,7 +8210,6 @@ var $author$project$Main$viewRectangle = F4(
 					$elm$core$String$fromInt(rectangle.w))
 				]));
 	});
-var $joakin$elm_canvas$Canvas$Settings$Text$Left = {$: 'Left'};
 var $author$project$Main$viewScore = F2(
 	function (model, renderables) {
 		return A4(
@@ -8173,35 +8220,13 @@ var $author$project$Main$viewScore = F2(
 					$joakin$elm_canvas$Canvas$Settings$fill($author$project$Main$colorWhilePlaying),
 					$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Left)
 				]),
-			_Utils_Tuple2(model.window.width - 180, 45),
-			'SCORE: ' + $elm$core$String$fromInt(model.score),
+			_Utils_Tuple2(model.window.width - 145, 45),
+			'SCORE:' + A3(
+				$elm$core$String$padLeft,
+				4,
+				_Utils_chr('0'),
+				$elm$core$String$fromInt(model.score)),
 			renderables);
-	});
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
-var $elm$core$String$repeatHelp = F3(
-	function (n, chunk, result) {
-		return (n <= 0) ? result : A3(
-			$elm$core$String$repeatHelp,
-			n >> 1,
-			_Utils_ap(chunk, chunk),
-			(!(n & 1)) ? result : _Utils_ap(result, chunk));
-	});
-var $elm$core$String$repeat = F2(
-	function (n, chunk) {
-		return A3($elm$core$String$repeatHelp, n, chunk, '');
-	});
-var $elm$core$String$padLeft = F3(
-	function (n, _char, string) {
-		return _Utils_ap(
-			A2(
-				$elm$core$String$repeat,
-				n - $elm$core$String$length(string),
-				$elm$core$String$fromChar(_char)),
-			string);
 	});
 var $author$project$Main$viewTexts = F3(
 	function (model, input, renderables) {
@@ -8213,7 +8238,7 @@ var $author$project$Main$viewTexts = F3(
 					$joakin$elm_canvas$Canvas$Settings$fill($author$project$Main$colorWhilePlaying),
 					$joakin$elm_canvas$Canvas$Settings$Text$align($joakin$elm_canvas$Canvas$Settings$Text$Left)
 				]),
-			_Utils_Tuple2((model.window.width / 2) - 90, model.window.height - 45),
+			_Utils_Tuple2(model.window.width - 180, model.window.height - 45),
 			A3(
 				$elm$core$String$padLeft,
 				3,
@@ -8226,25 +8251,28 @@ var $author$project$Main$viewCanvas = function (model) {
 		A2($elm$core$List$map, $elm$core$String$fromInt, model.numInput));
 	var lg = A2($elm$core$Debug$log, 'input ', input);
 	return A2(
-		$author$project$Main$viewCountDown,
+		$author$project$Main$viewLevel,
 		model,
 		A2(
-			$author$project$Main$viewScore,
+			$author$project$Main$viewCountDown,
 			model,
-			A3(
-				$author$project$Main$viewTexts,
+			A2(
+				$author$project$Main$viewScore,
 				model,
-				input,
-				A4(
-					$author$project$Main$viewRectangle,
-					model.rectangle,
-					model.window,
-					$author$project$Main$colorWhilePlaying,
-					A3(
-						$author$project$Main$viewFullscreenRect,
+				A3(
+					$author$project$Main$viewTexts,
+					model,
+					input,
+					A4(
+						$author$project$Main$viewRectangle,
+						model.rectangle,
 						model.window,
-						A3($avh4$elm_color$Color$rgb, 0.9, 0.7, 1),
-						_List_Nil)))));
+						$author$project$Main$colorWhilePlaying,
+						A3(
+							$author$project$Main$viewFullscreenRect,
+							model.window,
+							A3($avh4$elm_color$Color$rgb, 0.9, 0.7, 1),
+							_List_Nil))))));
 };
 var $author$project$Main$view = function (model) {
 	return A2(

@@ -66,8 +66,8 @@ initModel : Flag -> Model
 initModel flag =
     { count = 0
     , window =
-        { width = flag.width / 2
-        , height = flag.height / 2
+        { width = flag.width * 0.9
+        , height = flag.height * 0.9
         }
     , highestNum = 1
     , rectangle = Rectangle 2 3
@@ -312,22 +312,30 @@ viewTexts : Model -> String -> List Renderable -> List Renderable
 viewTexts model input renderables =
     renderables
         |> textComposable [ font 80, fill colorWhilePlaying, align Left ]
-            ( model.window.width / 2 - 90, (model.window.height) - 45 )
+            ( model.window.width - 180, (model.window.height) - 45 )
             (String.padLeft 3 '0' <| input)
 
 viewScore : Model -> List Renderable -> List Renderable
 viewScore model renderables =
     renderables 
         |> textComposable [ font 20, fill colorWhilePlaying, align Left ]
-            ( model.window.width - 180 , 45 )
-            ("SCORE: " ++ String.fromInt model.score)
+            ( model.window.width - 145 , 45 )
+            ((++) "SCORE:" <| String.padLeft 4 '0' <| String.fromInt model.score)
 
 viewCountDown : Model -> List Renderable -> List Renderable
 viewCountDown model renderables =
     renderables 
-        |> textComposable [ font 20, fill colorWhilePlaying, align Right ]
-            ( 180 , 45 )
-            (String.fromInt model.countDown)
+        |> textComposable [ font 20, fill colorWhilePlaying, align Left ]
+            ( 45 , 45 )
+            (String.padLeft 2 '0' <| String.fromInt model.countDown)
+
+viewLevel : Model -> List Renderable -> List Renderable
+viewLevel model renderables =
+    renderables 
+        |> textComposable [ font 20, fill colorWhilePlaying, align Left ]
+            ( model.window.width - 260 , 45 )
+            ((++) "LEVEL:" <| String.padLeft 2 '0' <| String.fromInt model.highestNum)
+
 
 viewRectangle : Rectangle -> Window -> Color.Color -> List Renderable -> List Renderable
 viewRectangle rectangle window color renderables =
@@ -380,6 +388,7 @@ viewCanvas model =
         |> viewTexts model input
         |> viewScore model
         |> viewCountDown model
+        |> viewLevel model
         
 
 
